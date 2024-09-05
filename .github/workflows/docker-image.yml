@@ -24,12 +24,12 @@ jobs:
           ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
           ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
         run: |
-          echo -n "$ACR_PASSWORD" | docker login registry.cn-beijing.aliyuncs.com -u dkzx_test --password-stdin
+          echo -n "$ACR_PASSWORD" | docker login $ACR_REGISTRY -u $ACR_USERNAME --password-stdin
       - name: 构建镜像并推送
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.9
+          tags: ${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_USERNAME }}/python:3.9
 
