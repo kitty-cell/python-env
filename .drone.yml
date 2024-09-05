@@ -1,0 +1,44 @@
+kind: pipeline
+type: docker
+name: tensorflow_gpu_env
+steps:
+  - name: build_image
+    image: plugins/docker:20
+    depends_on: [clone]
+    environment:
+      DRONE_REPO_BRANCH: master
+      TZ: Asia/Shanghai
+    # volumes:
+    # commands:
+    #   - pwd
+    #   - cd /drone
+    #   - ls -la
+    #   - cd src
+    #   - ls -la
+    #   - which Dockerfile
+    #   - name: docker-sock
+    #     path: /var/run/docker.sock
+    settings:
+      dockerfile: Dockerfile
+      registry: registry.cn-beijing.aliyuncs.com
+      repo: registry.cn-beijing.aliyuncs.com/dkzx_test/tensorflow_gpu_env:2.16
+      auto_tag: true
+      insecure: true
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+#volumes:
+#  # - name: docker-sock
+#  #   host:
+#  #     path: /var/run/docker.sock
+#  - name: node_modules
+#    host:
+#      path: /root/.node/node_modules
+trigger:
+  ref:
+    - refs/tags/*
+    - refs/heads/master
+
+caches:
+  - pip
