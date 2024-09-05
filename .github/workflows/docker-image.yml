@@ -24,8 +24,7 @@ jobs:
           ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
           ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
         run: |
-          docker logout $ACR_REGISTRY
-          echo -n "$ACR_PASSWORD" | docker login $ACR_REGISTRY -u $ACR_USERNAME --password-stdin
+          echo -n "$ACR_PASSWORD" | docker login $ACR_REGISTRY -u $ACR_USERNAME --password-stdin --debug
       - name: 构建镜像并推送
         uses: docker/build-push-action@v5
         with:
