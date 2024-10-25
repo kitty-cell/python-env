@@ -4,4 +4,4 @@ neuralprophet==0.9.0
 pandas==2.2.3
 PyMySQL==1.1.1
 schedule==1.2.1
-sklearn==1.4.2
+sklearn==1.2.2
