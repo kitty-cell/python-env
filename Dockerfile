@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 #安装依赖
-RUN pip install --no-cache-dir --default-timeout=100  -r requirements_load.txt
+RUN pip install --default-timeout=100  -r requirements_load.txt
 
 
 
