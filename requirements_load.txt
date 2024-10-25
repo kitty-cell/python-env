@@ -1,6 +1,7 @@
-chinese_calendar==1.9.2
-loguru==0.7.2
-neuralprophet==0.9.0
-pandas==2.2.3
-PyMySQL==1.1.1
-schedule==1.2.1
+# chinese_calendar==1.9.2
+# loguru==0.7.2
+# neuralprophet==0.9.0
+# pandas==2.2.3
+# PyMySQL==1.1.1
+# schedule==1.2.1
+sklearn==1.4.2
