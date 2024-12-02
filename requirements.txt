@@ -1,4 +1,4 @@
-chinese_calendar==1.9.2
+chinese_calendar==1.10.0
 loguru==0.7.2
 neuralprophet==0.9.0
 pandas==2.2.3
