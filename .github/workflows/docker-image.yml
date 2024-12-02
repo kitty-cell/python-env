@@ -31,6 +31,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.12_load_pre
+          # tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.12_load_pre
+          tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.9
           # tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/tensorflow_gpu_env:2.16.2
 
