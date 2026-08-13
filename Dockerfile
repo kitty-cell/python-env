@@ -18,13 +18,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements_evaluation.txt /app/requirements_evaluation.txt
+COPY requirements_evaluation.txt /app/requirements.txt
 
 RUN python -m pip install \
         --no-cache-dir \
         -i https://pypi.tuna.tsinghua.edu.cn/simple \
-        -r /app/requirements_evaluation.txt \
-    && rm -f /app/requirements_evaluation.txt
+        -r /app/requirements.txt \
+    && rm -f /app/requirements.txt
 
 COPY . /app
 
