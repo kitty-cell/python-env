@@ -1,0 +1,5 @@
+dbutils==3.1.2 
+loguru==0.7.3 
+pandas==3.0.5 
+pymysql==1.1.1 
+Requests==2.34.2

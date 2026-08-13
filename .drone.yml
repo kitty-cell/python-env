@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: tensorflow_gpu_env
+name: python
 steps:
   - name: build_image
     image: plugins/docker:20
@@ -21,7 +21,7 @@ steps:
     settings:
       dockerfile: Dockerfile
       registry: registry.cn-beijing.aliyuncs.com
-      repo: registry.cn-beijing.aliyuncs.com/dkzx_test/tensorflow_gpu_env:2.16
+      repo: registry.cn-beijing.aliyuncs.com/dkzx_test/python:evaluation
       auto_tag: true
       insecure: true
       username:
