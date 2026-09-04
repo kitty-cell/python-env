@@ -9,7 +9,7 @@
 
 # #安装依赖
 # RUN pip install --no-cache-dir --default-timeout=100  -r requirements.txt
-FROM python:3.12.7-slim-bookworm
+FROM --platform=linux/amd64 python:3.12.7-slim-bullseye
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
