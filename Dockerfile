@@ -9,7 +9,7 @@
 
 # #安装依赖
 # RUN pip install --no-cache-dir --default-timeout=100  -r requirements.txt
-FROM python:3.10.20-slim-bookworm
+FROM python:3.12.7-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -18,14 +18,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt /app/requirements.txt
+# COPY requirements.txt /app/requirements.txt
 
-RUN python -m pip install \
-        --no-cache-dir \
-        --default-timeout=100 \
-        -i https://pypi.tuna.tsinghua.edu.cn/simple \
-        -r /app/requirements.txt \
-    && rm -f /app/requirements.txt
+# RUN python -m pip install \
+#         --no-cache-dir \
+#         --default-timeout=100 \
+#         -i https://pypi.tuna.tsinghua.edu.cn/simple \
+#         -r /app/requirements.txt \
+#     && rm -f /app/requirements.txt
 
-COPY . /app
+# COPY . /app
 
