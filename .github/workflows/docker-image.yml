@@ -31,7 +31,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.12.7-slim-bookworm-gpu
+          tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.12.7-gpu
           platforms: linux/amd64
           provenance: false
           sbom: false

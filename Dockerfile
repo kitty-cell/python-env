@@ -1,52 +1,52 @@
-# # 基于python的基础镜像
-# FROM registry.cn-beijing.aliyuncs.com/dkzx_test/tensorflow_gpu_env:2.16.2
-# # FROM registry.cn-beijing.aliyuncs.com/dkzx_test/python:python:3.9_load_pre
-# # FROM python:3.9-slim
-# # 工作目录
-# WORKDIR /app
-# # 复制所有应用程序文件到工作目录
-# COPY . .
+# syntax=docker/dockerfile:1
 
-# #安装依赖
-# RUN pip install --no-cache-dir --default-timeout=100  -r requirements.txt
-# FROM --platform=linux/amd64 python:3.12.7-slim-bullseye
+ARG PYTHON_IMAGE=python:3.12.7-slim-bookworm
 
-# ENV PYTHONDONTWRITEBYTECODE=1 \
-#     PYTHONUNBUFFERED=1 \
-#     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-#     PIP_NO_CACHE_DIR=1
+# Builder contains pip's temporary files and dependency installation work.
+FROM --platform=linux/amd64 ${PYTHON_IMAGE} AS builder
 
-# WORKDIR /app
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
-# COPY requirements.txt /app/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 
-# RUN python -m pip install \
-#         --no-cache-dir \
-#         --default-timeout=100 \
-#         -i https://pypi.tuna.tsinghua.edu.cn/simple \
-#         -r /app/requirements.txt \
-#     && rm -f /app/requirements.txt
+# Install everything into an isolated directory. Pinning the local CUDA wheel
+# version avoids pip selecting the CUDA 13 build from PyPI.
+RUN python -m pip install \
+        --no-cache-dir \
+        --no-compile \
+        --target=/opt/python \
+        --index-url=https://pypi.org/simple \
+        --extra-index-url=https://download.pytorch.org/whl/cu128 \
+        -r /tmp/requirements.txt \
+        "torch==2.11.0+cu128" \
+        "tabpfn==8.5.0" \
+        "xgboost-cu12==3.4.1" \
+    && PYTHONPATH=/opt/python python -m pip check \
+    && find /opt/python -type f \
+        \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) -delete \
+    && find /opt/python -type d \
+        \( -name '__pycache__' -o -name 'test' -o -name 'tests' \) \
+        -prune -exec rm -rf '{}' + \
+    && rm -rf \
+        /opt/python/torch/include \
+        /opt/python/torch/share/cmake
 
-# COPY . /app
-FROM --platform=linux/amd64 python:3.12.7-slim-bookworm
+# The final image contains only the Python runtime and installed runtime files.
+FROM --platform=linux/amd64 ${PYTHON_IMAGE} AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+    PYTHONPATH=/opt/python \
+    PATH=/opt/python/bin:${PATH}
+
+COPY --from=builder /opt/python /opt/python
 
 WORKDIR /app
 
-COPY requirements.txt /tmp/requirements.txt
-
-RUN python -m pip install --no-compile \
-        --index-url https://download.pytorch.org/whl/cu128 \
-        torch==2.11.0 \
-    && python -m pip install --no-compile \
-        -r /tmp/requirements.txt \
-        tabpfn==8.5.0 \
-        xgboost-cu12==3.4.1 \
-    && python -m pip check \
-    && rm -f /tmp/requirements.txt
+# Import validation does not require a GPU; GPU visibility is checked at run time.
+RUN python -c "from importlib.metadata import version; import torch, tabpfn, xgboost; assert torch.version.cuda == '12.8'; print('torch', torch.__version__, 'tabpfn', version('tabpfn'), 'xgboost', xgboost.__version__)"
 
 CMD ["python"]
