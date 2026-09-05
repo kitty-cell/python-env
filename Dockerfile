@@ -10,9 +10,6 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 COPY requirements.txt /tmp/requirements.txt
-
-# Install everything into an isolated directory. Pinning the local CUDA wheel
-# version avoids pip selecting the CUDA 13 build from PyPI.
 RUN python -m pip install \
         --no-cache-dir \
         --no-compile \
@@ -20,7 +17,7 @@ RUN python -m pip install \
         --index-url=https://pypi.org/simple \
         --extra-index-url=https://download.pytorch.org/whl/cu128 \
         -r /tmp/requirements.txt \
-        "torch==2.11.0+cu128" \
+        "torch==2.7.1+cu128" \
         "tabpfn==8.5.0" \
         "xgboost-cu12==3.4.1" \
     && PYTHONPATH=/opt/python python -m pip check \
@@ -31,7 +28,9 @@ RUN python -m pip install \
         -prune -exec rm -rf '{}' + \
     && rm -rf \
         /opt/python/torch/include \
-        /opt/python/torch/share/cmake
+        /opt/python/torch/share/cmake \
+        /opt/python/triton \
+        /opt/python/triton-*.dist-info
 
 # The final image contains only the Python runtime and installed runtime files.
 FROM --platform=linux/amd64 ${PYTHON_IMAGE} AS runtime
@@ -45,8 +44,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 COPY --from=builder /opt/python /opt/python
 
 WORKDIR /app
-
-# Import validation does not require a GPU; GPU visibility is checked at run time.
 RUN python -c "from importlib.metadata import version; import torch, tabpfn, xgboost; assert torch.version.cuda == '12.8'; print('torch', torch.__version__, 'tabpfn', version('tabpfn'), 'xgboost', xgboost.__version__)"
 
 CMD ["python"]
