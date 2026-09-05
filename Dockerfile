@@ -9,14 +9,14 @@
 
 # #安装依赖
 # RUN pip install --no-cache-dir --default-timeout=100  -r requirements.txt
-FROM --platform=linux/amd64 python:3.12.7-slim-bullseye
+# FROM --platform=linux/amd64 python:3.12.7-slim-bullseye
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+# ENV PYTHONDONTWRITEBYTECODE=1 \
+#     PYTHONUNBUFFERED=1 \
+#     PIP_DISABLE_PIP_VERSION_CHECK=1 \
+#     PIP_NO_CACHE_DIR=1
 
-WORKDIR /app
+# WORKDIR /app
 
 # COPY requirements.txt /app/requirements.txt
 
@@ -28,4 +28,25 @@ WORKDIR /app
 #     && rm -f /app/requirements.txt
 
 # COPY . /app
+FROM --platform=linux/amd64 python:3.12.7-slim-bookworm
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN python -m pip install --no-compile \
+        --index-url https://download.pytorch.org/whl/cu128 \
+        torch==2.11.0 \
+    && python -m pip install --no-compile \
+        -r /tmp/requirements.txt \
+        tabpfn==8.5.0 \
+        xgboost-cu12==3.4.1 \
+    && python -m pip check \
+    && rm -f /tmp/requirements.txt
+
+CMD ["python"]
