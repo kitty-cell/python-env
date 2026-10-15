@@ -1,26 +1,30 @@
-# 使用阿里云 Python 镜像作为基础镜像
-FROM registry.cn-beijing.aliyuncs.com/aeo_algorithm/python:3.9.10-slim-arm64
+FROM --platform=linux/arm64 python:3.9.10-slim
 
 # 设置APT的环境变量
 ENV TZ=Asia/Shanghai
-RUN rm -f /etc/localtime && \
-    ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-# 安装系统依赖（仅保留必要项）
+# 更换debian源
 COPY ./debian.sources /etc/apt/sources.list.d/debian.sources
+
+# 安装系统依赖 + tzdata时区包
 RUN apt-get clean && \
     apt-get update && \
-    apt-get -y install cron && \
-    apt-get -y install vim && \
-    apt-get install -y libpq-dev gcc && \
+    apt-get -y install tzdata cron vim libpq-dev gcc && \
+    # 设置时区
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
 WORKDIR /app
-# 复制当前目录下的所有文件到工作目录
-COPY ./requirements.txt /app/
 
-# 安装python环境
-RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --disable-pip-version-check
-RUN rm -rf /app/*
+# 先拷贝依赖文件，利用docker缓存
+COPY ./requirements.txt /app/
+# 安装python包，清理pip缓存（不要删/app！）
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --disable-pip-version-check \
+    && rm -rf /root/.cache/pip
+
+# 复制业务代码（放在pip install之后，代码变更不重复重装依赖）
+COPY . /app
+
+CMD ["python"]
