@@ -31,8 +31,9 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/aeo_algorithm/python:3.9.10-slim
-          platforms: linux/amd64
+          tags: ${{ secrets.ACR_REGISTRY }}/aeo_algorithm/python:3.9.10-slim-arm64
+          # platforms: linux/amd64
+          platforms: linux/arm64
           provenance: false
           sbom: false
           # tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.9
