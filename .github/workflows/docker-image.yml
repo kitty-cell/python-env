@@ -1,15 +1,11 @@
 name: Docker Image CI
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
-
   python-build:
-
     runs-on: ubuntu-latest
     steps:
       - name: 读取仓库内容
@@ -25,17 +21,14 @@ jobs:
           ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
         run: |
           echo -n "$ACR_PASSWORD" | docker login $ACR_REGISTRY -u $ACR_USERNAME --password-stdin
+
       - name: 构建镜像并推送
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile
+          file: Dockerfile_build
           push: true
-          tags: ${{ secrets.ACR_REGISTRY }}/aeo_algorithm/python:3.9.10-slim-arm64
-          # platforms: linux/amd64
+          tags: ${{ secrets.ACR_REGISTRY }}/aeo_algorithm/python:rolling_cron
           platforms: linux/arm64
           provenance: false
           sbom: false
-          # tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/python:3.9
-          # tags: ${{ secrets.ACR_REGISTRY }}/dkzx_test/tensorflow_gpu_env:2.16.2
-

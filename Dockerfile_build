@@ -1,0 +1,26 @@
+# 使用阿里云 Python 镜像作为基础镜像
+FROM registry.cn-beijing.aliyuncs.com/aeo_algorithm/python:3.9.10-slim-arm64
+
+# 设置APT的环境变量
+ENV TZ=Asia/Shanghai
+RUN rm -f /etc/localtime && \
+    ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+# 安装系统依赖（仅保留必要项）
+COPY ./debian.sources /etc/apt/sources.list.d/debian.sources
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get -y install cron && \
+    apt-get -y install vim && \
+    apt-get install -y libpq-dev gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 设置工作目录
+WORKDIR /app
+# 复制当前目录下的所有文件到工作目录
+COPY ./requirements.txt /app/
+
+# 安装python环境
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --disable-pip-version-check
+RUN rm -rf /app/*
