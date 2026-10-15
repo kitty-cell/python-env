@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 python:3.9.10-slim
+FROM --platform=linux/arm64 python:3.9-bookworm
 
 # 设置APT的环境变量
 ENV TZ=Asia/Shanghai
